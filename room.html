@@ -479,10 +479,61 @@ window.localStorage.setItem('messages', messageArray);
     n.textContent = arg;
     names.appendChild(n);
   })
+  
+function syncObj() { 
+var socket = io.connect() 
+socket.emit('sync', `${objId}`)}
+// Listen for events
+function syncComplete() {
+var socket = io.connect()
+socket.on('sync', function (data) {
+objId = data
+noti5()
+document.getElementById("note4").style.display = "none";
+document.getElementById("note6").style.display = "none";
+// What do do when sync is complete
+// Say Something
+// Refresh Screen
+})
+}
+
+//Server:
+const express = require('express');
+const opn = require('opn');
+const app = express();
+const port = 5000
+var socket = require('socket.io')
+const cors = require("cors")
+
+function allowCrossDomain(req, res, next) {
+res.header('Access-Control-Allow-Origin', '*')
+res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH,   DELETE, OPTIONS');
+res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With,   Content-Type, Accept");
+next()}
+app.use(allowCrossDomain)
+app.use(cors())
+app.use('/', express.static(__dirname + '/public'))
+
+var server = app.listen(port, function () {
+console.log('listening to request on port 5000');
+opn(`http://localhost:${port}`);
+});
+
+// Socket Setup
+var io = socket(server);
+io.on('connection', function (socket) {
+console.log('made socket connection', socket.id)
+
+socket.on("sync", function(data){
+io.sockets.emit('sync', data)
+})
+})
   // document.getElementById('users').innerText = JSON.stringify(users);
 </script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.dev.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.8.0/firebase.js"></script>
-<script src="stylish.js" defer></script>
+  <script src="stylish.js" defer></script>
 <script src="/node_modules/firebase/firebase-database.js"></script>
 <script defer type="module" src="/firebase.js">
 
